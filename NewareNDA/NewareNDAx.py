@@ -154,7 +154,9 @@ def _data_interpolation(df):
     df['Time'] = df['Time'].where(nan_mask2, time)
 
     # Fill in missing Timestamps
-    time_inc = df['Time'].diff().groupby(nan_mask.cumsum()).cumsum()
+    time_inc = df['Time'].diff()
+    time_inc[time_inc < 0] = 0
+    time_inc = time_inc.groupby(nan_mask.cumsum()).cumsum()
     timestamp = df['Timestamp'].ffill() + \
         pd.to_timedelta(time_inc.shift().fillna(0), unit='s')
     df['Timestamp'] = df['Timestamp'].where(nan_mask, timestamp)
